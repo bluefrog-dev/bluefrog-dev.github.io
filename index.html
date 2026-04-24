@@ -132,16 +132,9 @@
             },
           },
           animation: {
-            blob: 'blob 14s ease-in-out infinite',
-            'blob-slow': 'blob 22s ease-in-out infinite',
             marquee: 'marquee 40s linear infinite',
           },
           keyframes: {
-            blob: {
-              '0%,100%': { transform: 'translate(0px, 0px) scale(1)' },
-              '33%':     { transform: 'translate(30px, -40px) scale(1.1)' },
-              '66%':     { transform: 'translate(-20px, 20px) scale(0.95)' },
-            },
             marquee: {
               from: { transform: 'translateX(0)' },
               to:   { transform: 'translateX(-50%)' },
@@ -205,10 +198,12 @@
       box-shadow: 0 20px 40px -24px rgba(17,24,39,0.12);
     }
 
-    /* Hero blob container */
+    /* Hero blob container — soft glow via mask, no filter cost */
     .blob {
-      position:absolute; filter: blur(60px); opacity:0.45;
+      position:absolute; opacity:0.5;
       border-radius: 9999px; pointer-events:none;
+      -webkit-mask-image: radial-gradient(closest-side, #000 20%, transparent 72%);
+              mask-image: radial-gradient(closest-side, #000 20%, transparent 72%);
     }
 
     /* Metric number */
@@ -220,10 +215,9 @@
       font-feature-settings: "tnum";
     }
 
-    /* Nav transitions */
+    /* Nav transitions — solid semi-transparent bg (no backdrop-filter) */
     .nav-wrap.scrolled > div {
-      background: rgba(255,255,255,0.85);
-      backdrop-filter: saturate(180%) blur(14px);
+      background: rgba(255,255,255,0.94);
       border-color: #e5e7eb;
       box-shadow: 0 10px 30px -20px rgba(17,24,39,0.15);
     }
@@ -267,10 +261,12 @@
       -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 80%);
     }
 
-    /* Service card accent swoosh */
+    /* Service card accent swoosh — soft glow via mask, no filter cost */
     .svc-accent {
       position:absolute; inset: -20% -10% auto auto; width: 60%; height: 60%;
-      filter: blur(50px); opacity: 0.55; border-radius: 9999px; pointer-events:none;
+      opacity: 0.6; border-radius: 9999px; pointer-events:none;
+      -webkit-mask-image: radial-gradient(closest-side, #000 15%, transparent 75%);
+              mask-image: radial-gradient(closest-side, #000 15%, transparent 75%);
     }
 
     /* Skip link */
@@ -305,7 +301,13 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .reveal, .animate-blob, .animate-blob-slow, .animate-marquee { animation: none !important; opacity: 1 !important; }
+      .reveal, .animate-marquee { animation: none !important; opacity: 1 !important; }
+    }
+
+    /* Defer paint on offscreen sections to reduce scroll work */
+    .paint-defer {
+      content-visibility: auto;
+      contain-intrinsic-size: auto 900px;
     }
   </style>
 </head>
@@ -315,7 +317,7 @@
 
   <!-- ========== HEADER / NAV ========== -->
   <header class="nav-wrap fixed top-0 left-0 right-0 z-40 px-4 sm:px-6 pt-4" role="banner">
-    <div class="max-w-7xl mx-auto flex items-center justify-between rounded-full border border-gray-200/60 bg-white/70 backdrop-blur-md px-4 sm:px-5 py-2.5 transition-all">
+    <div class="max-w-7xl mx-auto flex items-center justify-between rounded-full border border-gray-200/60 bg-white/90 px-4 sm:px-5 py-2.5 transition-all">
       <a href="#top" class="flex items-center" aria-label="블루프로그">
         <img src="/logo.svg" alt="블루프로그 로고" width="32" height="22" class="logo-mark h-5 sm:h-[22px] w-auto" />
       </a>
@@ -333,15 +335,15 @@
       <div class="flex items-center gap-3">
         <div class="relative hidden sm:block">
           <button id="lang-toggle" type="button" class="lang-dropdown-btn inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-700 hover:border-gray-300 transition" aria-haspopup="listbox" aria-expanded="false" aria-label="언어 선택">
-            <iconify-icon icon="solar:global-linear" width="14"></iconify-icon>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a13.5 13.5 0 0 1 0 18M12 3a13.5 13.5 0 0 0 0 18" stroke-linecap="round"/></svg>
             <span id="lang-current">한국어</span>
-            <iconify-icon icon="solar:alt-arrow-down-linear" width="12" class="text-gray-400"></iconify-icon>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
           </button>
           <ul id="lang-menu" class="lang-menu hidden absolute right-0 mt-2 w-44 rounded-xl border border-gray-200 bg-white shadow-lg py-1.5 z-50" role="listbox" aria-label="언어 목록">
-            <li><button type="button" class="lang-item w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center justify-between" data-lang="ko" role="option"><span>한국어</span><iconify-icon icon="solar:check-read-linear" class="text-brand-600 lang-check"></iconify-icon></button></li>
-            <li><button type="button" class="lang-item w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center justify-between" data-lang="en" role="option"><span>English</span><iconify-icon icon="solar:check-read-linear" class="text-brand-600 lang-check"></iconify-icon></button></li>
-            <li><button type="button" class="lang-item w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center justify-between" data-lang="ja" role="option"><span>日本語</span><iconify-icon icon="solar:check-read-linear" class="text-brand-600 lang-check"></iconify-icon></button></li>
-            <li><button type="button" class="lang-item w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center justify-between" data-lang="vi" role="option"><span>Tiếng Việt</span><iconify-icon icon="solar:check-read-linear" class="text-brand-600 lang-check"></iconify-icon></button></li>
+            <li><button type="button" class="lang-item w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center justify-between" data-lang="ko" role="option"><span>한국어</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-600 lang-check" aria-hidden="true"><path d="M2 13l3 3 8-8"/><path d="M9 16l2 2L22 7"/></svg></button></li>
+            <li><button type="button" class="lang-item w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center justify-between" data-lang="en" role="option"><span>English</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-600 lang-check" aria-hidden="true"><path d="M2 13l3 3 8-8"/><path d="M9 16l2 2L22 7"/></svg></button></li>
+            <li><button type="button" class="lang-item w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center justify-between" data-lang="ja" role="option"><span>日本語</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-600 lang-check" aria-hidden="true"><path d="M2 13l3 3 8-8"/><path d="M9 16l2 2L22 7"/></svg></button></li>
+            <li><button type="button" class="lang-item w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center justify-between" data-lang="vi" role="option"><span>Tiếng Việt</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-600 lang-check" aria-hidden="true"><path d="M2 13l3 3 8-8"/><path d="M9 16l2 2L22 7"/></svg></button></li>
           </ul>
         </div>
         <a href="#contact" class="btn-primary rounded-full px-4 py-2 text-sm font-medium" data-ko="문의하기" data-ja="お問い合わせ" data-vi="Liên hệ" data-en="Contact">문의하기</a>
@@ -355,10 +357,10 @@
   <section id="top" class="relative overflow-hidden pt-36 sm:pt-44 pb-24 sm:pb-32">
     <!-- Decorative grid -->
     <div class="absolute inset-0 hero-grid"></div>
-    <!-- Blobs -->
-    <div class="blob animate-blob"       style="top:-80px; left:-80px; width:420px; height:420px; background:#bfdbfe;"></div>
-    <div class="blob animate-blob-slow"  style="top:40px; right:-120px; width:480px; height:480px; background:#a7f3d0;"></div>
-    <div class="blob animate-blob"       style="top:260px; left:30%; width:340px; height:340px; background:#fde68a; opacity:0.35;"></div>
+    <!-- Blobs (static, mask-based soft glow) -->
+    <div class="blob" style="top:-80px; left:-80px; width:420px; height:420px; background:#bfdbfe;"></div>
+    <div class="blob" style="top:40px; right:-120px; width:480px; height:480px; background:#a7f3d0;"></div>
+    <div class="blob" style="top:260px; left:30%; width:340px; height:340px; background:#fde68a; opacity:0.35;"></div>
 
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center max-w-4xl mx-auto">
@@ -381,7 +383,7 @@
         <div class="reveal reveal-4 mt-10 flex flex-wrap items-center justify-center gap-3">
           <a href="#services" class="btn-primary rounded-full px-7 py-3.5 text-sm font-semibold inline-flex items-center gap-2">
             <span data-ko="서비스 살펴보기" data-ja="サービスを見る" data-vi="Xem dịch vụ" data-en="Explore Services">서비스 살펴보기</span>
-            <iconify-icon icon="solar:arrow-right-linear" width="18"></iconify-icon>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M13 5l7 7-7 7"/></svg>
           </a>
           <a href="#contact" class="btn-ghost rounded-full px-7 py-3.5 text-sm font-semibold">
             <span data-ko="비즈니스 문의" data-ja="ビジネスお問い合わせ" data-vi="Liên hệ hợp tác" data-en="Business Inquiry">비즈니스 문의</span>
@@ -390,7 +392,7 @@
 
         <div class="reveal reveal-5 mt-6 text-sm text-gray-500 flex items-center justify-center gap-1.5">
           <span class="pen-note" data-ko="한국·일본·베트남에서 운영 중!" data-ja="韓国・日本・ベトナムで運営中!" data-vi="Đang hoạt động tại Hàn Quốc · Nhật Bản · Việt Nam!" data-en="Running across Korea · Japan · Vietnam!">한국·일본·베트남에서 운영 중!</span>
-          <iconify-icon icon="solar:arrow-right-up-linear" class="text-brand-600" width="18" style="transform: rotate(6deg);"></iconify-icon>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-brand-600" style="transform: rotate(6deg);" aria-hidden="true"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg>
         </div>
       </div>
 
@@ -507,7 +509,7 @@
   </section>
 
   <!-- ========== ABOUT ========== -->
-  <section id="about" class="relative py-28 sm:py-36">
+  <section id="about" class="paint-defer relative py-28 sm:py-36">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-10">
 
       <div class="lg:col-span-5">
@@ -553,7 +555,7 @@
   </section>
 
   <!-- ========== SERVICES ========== -->
-  <section id="services" class="relative py-24 sm:py-32 bg-gray-50/60 border-y border-gray-100">
+  <section id="services" class="paint-defer relative py-24 sm:py-32 bg-gray-50/60 border-y border-gray-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
       <div class="flex items-end justify-between flex-wrap gap-4 mb-14">
@@ -582,7 +584,7 @@
               </div>
               <div class="mt-1.5 text-sm text-gray-500" data-ko="지역 멤버십 패스 앱" data-ja="地域メンバーシップパスアプリ" data-vi="Ứng dụng thẻ thành viên vùng" data-en="Regional membership pass app">지역 멤버십 패스 앱</div>
             </div>
-            <iconify-icon icon="solar:arrow-right-up-linear" width="22" class="text-gray-400 group-hover:text-gray-900 transition-colors"></iconify-icon>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 group-hover:text-gray-900 transition-colors" aria-hidden="true"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg>
           </div>
 
           <p class="relative mt-8 text-lg sm:text-xl text-gray-800 leading-relaxed break-keep-all max-w-lg"
@@ -618,7 +620,7 @@
               </div>
               <div class="mt-1.5 text-sm text-gray-500" data-ko="숏폼 기반 제로파티 데이터 SaaS" data-ja="ショート動画型ゼロパーティーデータSaaS" data-vi="SaaS dữ liệu zero-party qua video ngắn" data-en="Short-form zero-party data SaaS">숏폼 기반 제로파티 데이터 SaaS</div>
             </div>
-            <iconify-icon icon="solar:arrow-right-up-linear" width="22" class="text-gray-400 group-hover:text-gray-900 transition-colors"></iconify-icon>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 group-hover:text-gray-900 transition-colors" aria-hidden="true"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg>
           </div>
 
           <p class="relative mt-8 text-lg sm:text-xl text-gray-800 leading-relaxed break-keep-all"
@@ -644,7 +646,7 @@
   </section>
 
   <!-- ========== MEDIA ========== -->
-  <section id="media" class="relative py-24 sm:py-32">
+  <section id="media" class="paint-defer relative py-24 sm:py-32">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-end justify-between flex-wrap gap-4 mb-12">
         <div>
@@ -671,7 +673,7 @@
             <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent"></div>
             <div class="absolute inset-0 flex items-center justify-center">
               <span class="flex items-center justify-center h-16 w-16 rounded-full bg-white/95 group-hover:bg-white transition shadow-lg">
-                <iconify-icon icon="solar:play-bold" class="text-gray-900 ml-1" width="28"></iconify-icon>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" class="text-gray-900 ml-1" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
               </span>
             </div>
           </div>
@@ -692,7 +694,7 @@
             <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent"></div>
             <div class="absolute inset-0 flex items-center justify-center">
               <span class="flex items-center justify-center h-16 w-16 rounded-full bg-white/95 group-hover:bg-white transition shadow-lg">
-                <iconify-icon icon="solar:play-bold" class="text-gray-900 ml-1" width="28"></iconify-icon>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" class="text-gray-900 ml-1" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
               </span>
             </div>
           </div>
@@ -713,7 +715,7 @@
             <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent"></div>
             <div class="absolute inset-0 flex items-center justify-center">
               <span class="flex items-center justify-center h-16 w-16 rounded-full bg-white/95 group-hover:bg-white transition shadow-lg">
-                <iconify-icon icon="solar:play-bold" class="text-gray-900 ml-1" width="28"></iconify-icon>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" class="text-gray-900 ml-1" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
               </span>
             </div>
           </div>
@@ -734,7 +736,7 @@
             <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent"></div>
             <div class="absolute inset-0 flex items-center justify-center">
               <span class="flex items-center justify-center h-16 w-16 rounded-full bg-white/95 group-hover:bg-white transition shadow-lg">
-                <iconify-icon icon="solar:play-bold" class="text-gray-900 ml-1" width="28"></iconify-icon>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" class="text-gray-900 ml-1" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
               </span>
             </div>
           </div>
@@ -761,7 +763,7 @@
   </div>
 
   <!-- ========== PRESS ========== -->
-  <section id="press" class="relative py-24 sm:py-32 bg-gray-50/60 border-y border-gray-100">
+  <section id="press" class="paint-defer relative py-24 sm:py-32 bg-gray-50/60 border-y border-gray-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-end justify-between flex-wrap gap-4 mb-12">
         <div>
@@ -789,7 +791,7 @@
           <div class="p-5">
             <div class="flex items-center justify-between">
               <div class="text-xs text-brand-600 font-semibold">경인일보</div>
-              <iconify-icon icon="solar:arrow-right-up-linear" class="text-gray-400 group-hover:text-gray-900 transition-colors" width="16"></iconify-icon>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 group-hover:text-gray-900 transition-colors" aria-hidden="true"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg>
             </div>
             <div class="mt-2 text-sm sm:text-base font-semibold text-gray-900 leading-snug break-keep-all line-clamp-3"
                  data-ko="[인터뷰] 멤버십 플랫폼 '소속' 운영 '블루프로그' 이준석 대표" data-ja="[インタビュー]メンバーシップ・プラットフォーム「sosok」運営 Bluefrog イ・ジュンソク代表" data-vi="[Phỏng vấn] CEO Lee Jun-seok của Bluefrog — công ty vận hành nền tảng thành viên sosok"
@@ -809,7 +811,7 @@
           <div class="p-5">
             <div class="flex items-center justify-between">
               <div class="text-xs text-brand-600 font-semibold">매일일보</div>
-              <iconify-icon icon="solar:arrow-right-up-linear" class="text-gray-400 group-hover:text-gray-900 transition-colors" width="16"></iconify-icon>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 group-hover:text-gray-900 transition-colors" aria-hidden="true"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg>
             </div>
             <div class="mt-2 text-sm sm:text-base font-semibold text-gray-900 leading-snug break-keep-all line-clamp-3"
                  data-ko="인천 보물섬 덕적도 투어, 민관 협업으로 지역 활성화 확인" data-ja="仁川・宝島「徳積島ツアー」、官民協業による地域活性化を確認" data-vi="Tour đảo Deokjeok — hợp tác công-tư làm sống lại du lịch vùng"
@@ -829,7 +831,7 @@
           <div class="p-5">
             <div class="flex items-center justify-between">
               <div class="text-xs text-brand-600 font-semibold">디스커버리뉴스</div>
-              <iconify-icon icon="solar:arrow-right-up-linear" class="text-gray-400 group-hover:text-gray-900 transition-colors" width="16"></iconify-icon>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 group-hover:text-gray-900 transition-colors" aria-hidden="true"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg>
             </div>
             <div class="mt-2 text-sm sm:text-base font-semibold text-gray-900 leading-snug break-keep-all line-clamp-3"
                  data-ko="인천관광공사 '2025 제2회 제물포 웨이브 마켓' 3만 2천명 방문 성료" data-ja="仁川観光公社「2025 第2回 済物浦ウェーブマーケット」来場者3万2千人で盛況のうちに閉幕" data-vi="Hội chợ Jemulpo Wave lần 2 của Tổng cục Du lịch Incheon đón 32.000 lượt khách"
@@ -849,7 +851,7 @@
           <div class="p-5">
             <div class="flex items-center justify-between">
               <div class="text-xs text-brand-600 font-semibold">시사일보</div>
-              <iconify-icon icon="solar:arrow-right-up-linear" class="text-gray-400 group-hover:text-gray-900 transition-colors" width="16"></iconify-icon>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 group-hover:text-gray-900 transition-colors" aria-hidden="true"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg>
             </div>
             <div class="mt-2 text-sm sm:text-base font-semibold text-gray-900 leading-snug break-keep-all line-clamp-3"
                  data-ko="인천중구문화재단 × ㈜블루프로그, 누들패스 시즌3 운영 시작" data-ja="仁川中区文化財団 × Bluefrog、ヌードルパス シーズン3 運営開始" data-vi="Quỹ Văn hóa Jung-gu Incheon × Bluefrog khởi động Noodle Pass Mùa 3"
@@ -864,7 +866,7 @@
   </section>
 
   <!-- ========== OFFICES ========== -->
-  <section id="offices" class="relative py-24 sm:py-32">
+  <section id="offices" class="paint-defer relative py-24 sm:py-32">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 mb-14">
         <div class="lg:col-span-5">
@@ -951,7 +953,7 @@
   </section>
 
   <!-- ========== CAREERS ========== -->
-  <section id="careers" class="relative py-24 sm:py-32 bg-gray-50/60 border-y border-gray-100">
+  <section id="careers" class="paint-defer relative py-24 sm:py-32 bg-gray-50/60 border-y border-gray-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
 
@@ -988,7 +990,7 @@
                 <a href="mailto:contact@bluefrog.co.kr?subject=%EC%B1%84%EC%9A%A9%20%EB%AC%B8%EC%9D%98" class="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-600 hover:text-brand-700 transition">
                   <iconify-icon icon="solar:letter-linear" width="16"></iconify-icon>
                   <span data-ko="미리 이야기 나누기" data-ja="先に話をしてみる" data-vi="Trò chuyện trước" data-en="Say hi in advance">미리 이야기 나누기</span>
-                  <iconify-icon icon="solar:arrow-right-linear" width="16"></iconify-icon>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M13 5l7 7-7 7"/></svg>
                 </a>
               </div>
             </div>
@@ -1001,8 +1003,8 @@
 
   <!-- ========== CTA ========== -->
   <section id="contact" class="relative overflow-hidden py-28 sm:py-36 border-t border-gray-100 bg-white">
-    <div class="blob animate-blob-slow" style="top:-60px; left:-80px; width:380px; height:380px; background:#dbeafe;"></div>
-    <div class="blob animate-blob"      style="bottom:-80px; right:-100px; width:440px; height:440px; background:#a7f3d0;"></div>
+    <div class="blob" style="top:-60px; left:-80px; width:380px; height:380px; background:#dbeafe;"></div>
+    <div class="blob" style="bottom:-80px; right:-100px; width:440px; height:440px; background:#a7f3d0;"></div>
 
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
