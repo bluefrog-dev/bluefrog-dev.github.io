@@ -1,0 +1,23 @@
+# macOS
+.DS_Store
+._*
+
+# Claude Code local
+.claude/
+
+# Editors / OS
+.vscode/
+.idea/
+*.swp
+*~
+
+# Python cache (if any scripts)
+__pycache__/
+*.pyc
+
+# Node / logs (just in case)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+.env
+.env.local
