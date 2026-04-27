@@ -6,7 +6,7 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Apple SD Gothic Neo', 'sans-serif'],
-        pen: ['"Apple Chancery"', '"Monotype Corsiva"', '"Segoe Script"', '"Bradley Hand"', 'cursive'],
+        pen: ['"Nanum Pen Script"', '"Apple Chancery"', '"Monotype Corsiva"', '"Segoe Script"', '"Bradley Hand"', 'cursive'],
       },
       colors: {
         brand: {
@@ -25,6 +25,7 @@ module.exports = {
           400: '#34d399',
           500: '#10b981',
           600: '#059669',
+          700: '#047857',
         },
       },
       animation: {

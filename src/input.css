@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===== Self-hosted handwritten font subset (5.4KB) ===== */
+@font-face {
+  font-family: 'Nanum Pen Script';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/nanum-pen-subset.woff2') format('woff2');
+}
+
 /* ===== Base ===== */
 html { scroll-behavior: smooth; background:#ffffff; }
 body {
@@ -10,10 +19,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
   color: #111827;
   background:#ffffff;
+  overflow-x: clip;
 }
-.break-keep-all { word-break: keep-all; }
+/* Korean syllable-aware wrap; allow break inside long non-CJK words
+   (e.g., Vietnamese compound terms) so text never overflows its container */
+.break-keep-all { word-break: keep-all; overflow-wrap: anywhere; }
 .font-pen {
-  font-family: 'Apple Chancery', 'Monotype Corsiva', 'Segoe Script', 'Bradley Hand', cursive;
+  font-family: 'Nanum Pen Script', 'Apple Chancery', 'Monotype Corsiva', 'Segoe Script', 'Bradley Hand', cursive;
 }
 
 /* ===== Reveal cascade ===== */
@@ -68,6 +80,7 @@ body {
   letter-spacing: -0.03em;
   line-height: 0.95;
   font-feature-settings: "tnum";
+  min-width: 0;
 }
 
 /* ===== Nav transitions ===== */
@@ -89,10 +102,10 @@ body {
 .logo-mark { transition: transform 0.5s cubic-bezier(0.16,1,0.3,1); }
 a:hover > .logo-mark { transform: rotate(-8deg) scale(1.06); }
 
-/* ===== Handwritten note arrow (system cursive) ===== */
+/* ===== Handwritten note arrow (Nanum Pen Script with cursive fallback) ===== */
 .pen-note {
   color:#2563eb;
-  font-family: 'Apple Chancery', 'Monotype Corsiva', 'Segoe Script', 'Bradley Hand', cursive;
+  font-family: 'Nanum Pen Script', 'Apple Chancery', 'Monotype Corsiva', 'Segoe Script', 'Bradley Hand', cursive;
   font-size: 1.5rem;
   transform: rotate(-6deg);
   display:inline-block;
