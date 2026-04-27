@@ -37,14 +37,14 @@ body {
   font-family: 'Nanum Pen Script', 'Apple Chancery', 'Monotype Corsiva', 'Segoe Script', 'Bradley Hand', cursive;
 }
 
-/* ===== Reveal cascade ===== */
-@keyframes fadeInUp { from {opacity:0; transform: translateY(1rem);} to {opacity:1; transform: translateY(0);} }
-.reveal { opacity: 0; animation: fadeInUp 0.9s cubic-bezier(0.16,1,0.3,1) forwards; }
-.reveal-1 { animation-delay: 0.05s; }
-.reveal-2 { animation-delay: 0.15s; }
-.reveal-3 { animation-delay: 0.25s; }
-.reveal-4 { animation-delay: 0.35s; }
-.reveal-5 { animation-delay: 0.45s; }
+/* ===== Reveal cascade — short durations so LCP/SI aren't held hostage by fade-in ===== */
+@keyframes fadeInUp { from {opacity:0; transform: translateY(0.5rem);} to {opacity:1; transform: translateY(0);} }
+.reveal { opacity: 0; animation: fadeInUp 0.4s cubic-bezier(0.16,1,0.3,1) forwards; }
+.reveal-1 { animation-delay: 0s; }
+.reveal-2 { animation-delay: 0.04s; }
+.reveal-3 { animation-delay: 0.08s; }
+.reveal-4 { animation-delay: 0.12s; }
+.reveal-5 { animation-delay: 0.16s; }
 
 /* ===== Buttons ===== */
 .btn-primary {
