@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===== Self-hosted Pretendard Variable subset (133KB, only chars used on this page) ===== */
+@font-face {
+  font-family: 'Pretendard';
+  font-style: normal;
+  font-weight: 45 920;
+  font-display: swap;
+  src: url('/fonts/pretendard-subset.woff2') format('woff2-variations');
+}
+
 /* ===== Self-hosted handwritten font subset (5.4KB) ===== */
 @font-face {
   font-family: 'Nanum Pen Script';

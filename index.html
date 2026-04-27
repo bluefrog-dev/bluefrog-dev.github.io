@@ -155,12 +155,10 @@
   }
   </script>
 
-  <link rel="preload" as="style" href="/styles.css" fetchpriority="high" />
+  <link rel="preload" as="style" href="/styles.css" />
   <link rel="stylesheet" href="/styles.css" />
-  <!-- Pretendard CSS: lazy-load via media=print trick (low priority, non-render-blocking).
-       System fonts paint first, Pretendard swaps in via font-display: swap. -->
-  <link rel="stylesheet" href="/fonts/pretendard.css" media="print" onload="this.media='all'" />
-  <noscript><link rel="stylesheet" href="/fonts/pretendard.css" /></noscript>
+  <!-- Single self-hosted Pretendard subset (only chars used on page) — one request, font-display: swap -->
+  <link rel="preload" as="font" type="font/woff2" href="/fonts/pretendard-subset.woff2" crossorigin />
   <link rel="preload" as="font" type="font/woff2" href="/fonts/nanum-pen-subset.woff2" crossorigin />
 
 </head>
